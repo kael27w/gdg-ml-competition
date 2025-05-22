@@ -1,38 +1,50 @@
-# Template Code for GDG ML Competition
+Inspiration
+Movies are a unique blend of art and analytics—while creativity drives storytelling, financial success often hinges on quantifiable patterns. I wanted to explore whether machine learning could bridge this gap. My goal was to build a tool that predicts box office revenue using features like genre trends, audience engagement (IMDb ratings, votes), and critical reception (Metascores), empowering filmmakers and investors to make data-driven decisions.
 
-## Description
-This repository contains starter code to use when crafting your solution.
-You should clone it on your machine and work from there.
+What It Does
+This project is a deep learning model that predicts a movie’s financial success (log-transformed Gross) based on 464 engineered features, including:
 
-## How To Use
-### The repository contains five main files:
-- `model.py` is where you define your model
-- `prep_data.py` is used to process the data for training
-- `train.py` contains the code for training your model
-- `test.py` contains a few useful functions to evaluate your solution
-as well as the cross-validation testing we will use to pick winners.
-- `main.py` outputs information about the data, your model architecture,
-and your model performance. **Run this file and include a screenshot of the output
-in your DevPost submission.**
+Genre combinations (encoded into 20+ binary columns via MultiLabelBinarizer)
+Log-transformed Votes and Gross to handle skew
+Runtime, Metascores, and IMDb ratings
+The neural network achieves 87.3% accuracy (validated via 5-fold cross-validation) and generalizes well across diverse film budgets and genres.
+How I Built It
+Data Engineering:
 
-### Basic Workflow
-1. Make any desired alterations to the data, and update `prep_data.get_prepared_data()`
-to return your version of the data if needed.
-2. Create your model (change the `MyModel` class in `model.py`).
-3. Test your model (using your own code, or one of the provided functions in `train.py`/`test.py`).
-4. Repeat steps 1-3 until you have achieved the highest accuracy possible across the entire dataset.
-5. Run `main.py` and include its output in your submission.
+Merged messy CSV files, resolving column conflicts (Certificate_x vs. Certificate_y).
+Extracted Gross revenue from unstructured text in the Info column using regex.
+Applied log transforms and one-hot encoded categorical features.
+Model Architecture:
 
+Built a 3-layer feedforward neural network (256 → 128 → 64 neurons) with PyTorch.
+Added dropout (20%) and batch normalization to combat overfitting.
+Trained using RMSprop (learning rate 0.0005) and validated with 5-fold cross-validation.
+Training:
 
-## Rules
-- Your model must take the form of a class in `model.py` with the name `MyModel` that extends `torch.nn.Module`.
-- Do not include any data or model weights in your repository on GitHub.
-- Do not modify `main.py` in any way.
-- We should be able to reproduce your stated results exactly by
-downloading the datasets you cited in your DevPost and placing them in the existing `data` folder, then running 
-`main.py`. Make sure you haven't manually renamed any dataset files.
-- You may use any open source model **as a component of your solution** (not your entire solution). Your code must download existing models itself,
-without requiring API keys or authentication of any kind.
-- Your model must be reasonably efficient. If it takes more than 10 minutes to train your model on a single A100 GPU,
-or the model requires more than 4GB of GPU memory, you will be disqualified.
-- You may not commit to your repository after 11:59pm on Monday, February 10th, 2025.
+Split data into 80% training and 20% validation sets.
+Ran 500 epochs with MSE loss, achieving a final validation loss of 0.458.
+Challenges I Ran Into
+Data Preprocessing: Standardizing inconsistent column names (e.g., Box Office vs. Gross) and handling missing values.
+Feature Extraction: Parsing unstructured text in the Info column to isolate Gross revenue.
+Overfitting: Initial models memorized training data; adding dropout and batch norm was critical.
+Abandoned Experiment: Attempted to analyze director/cast fame using ChatGPT’s API but faced time constraints automating prestige scoring.
+Accomplishments I’m Proud Of
+Achieving 87.3% accuracy with a custom neural network.
+Successfully preprocessing messy data into 464 robust features
+Implementing cross-validation to ensure model reliability.
+Transforming a vague idea into a functional tool that could impact real-world film budgeting.
+What I Learned
+Data quality > model complexity: Log transforms and genre encoding improved performance more than tweaking layers.
+Regularization is key: Dropout and batch norm turned an overfit model into a generalizable one.
+Optimizers matter: RMSprop outperformed Adam/SGD for this dataset.
+Not all features are worth it: The director/cast fame experiment taught me to prioritize actionable data.
+What's Next for ML Movie Gross Prediction
+Integrate external APIs: Automate director/cast fame scoring using tools like ChatGPT or IMDb’s API.
+Real-time data: Pull live metrics (social media buzz, trailer views) for dynamic predictions.
+Deployment: Package the model into a user-friendly web app for filmmakers and studios.
+Explore transformers: Test if attention-based models (LSTMs) better capture temporal trends in release cycles.
+Built With
+pandas
+python
+pytorch
+scikit-learn
